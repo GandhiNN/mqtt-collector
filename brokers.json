@@ -1,0 +1,10 @@
+[
+    {
+        "id": "broker1",
+        "url": "tcp://localhost:1883"
+    },
+    {
+        "id": "broker2",
+        "url": "tcp://localhost:1884"
+    }
+]
