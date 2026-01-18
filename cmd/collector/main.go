@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"mqtt-collector/internal/collector"
 	"mqtt-collector/internal/config"
 )
 
