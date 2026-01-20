@@ -53,10 +53,3 @@ func loadBrokersConfig(configPath string) ([]BrokerConfig, error) {
 
 	return brokers, nil
 }
-
-func getEnv(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
-}
