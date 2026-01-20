@@ -132,7 +132,7 @@ func TestLoad(t *testing.T) {
 		os.Unsetenv("COLLECTION_DURATION")
 	}()
 
-	cfg, err := Load()
+	cfg, err := LoadCollectorConfig()
 	if err != nil {
 		t.Fatalf("Load () error = %v", err)
 	}

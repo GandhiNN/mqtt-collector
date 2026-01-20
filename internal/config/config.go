@@ -18,7 +18,7 @@ type Config struct {
 	CollectionDuration time.Duration
 }
 
-func Load() (*Config, error) {
+func LoadCollectorConfig() (*Config, error) {
 	configPath := getEnv("BROKERS_CONFIG", "brokers.json")
 	dbServiceURL := getEnv("DB_SERVICE_URL", "http://localhost:8080")
 	durationStr := getEnv("COLLECTION_DURATION", "1m")
