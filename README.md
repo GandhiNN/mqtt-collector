@@ -1,1 +1,1 @@
-# mqtt-collector
+# MQTT Catalog
