@@ -1,4 +1,4 @@
-module mqtt-collector
+module mqtt-catalog
 
 go 1.25.0
 
