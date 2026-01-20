@@ -1,6 +1,7 @@
 package payload
 
 import (
+	"bytes"
 	"encoding/json"
 	"encoding/xml"
 	"mqtt-collector/internal/models"
@@ -12,10 +13,14 @@ func DetectType(payload []byte) models.PayloadType {
 		return models.PayloadText
 	}
 
-	// try JSON
-	var js json.RawMessage
-	if json.Unmarshal(payload, &js) == nil {
-		return models.PayloadJSON
+	// JSON validator
+	// Only consider objects {} and arrays [] as JSON
+	trimmed := bytes.TrimSpace(payload)
+	if len(trimmed) > 0 && (trimmed[0] == '{' || trimmed[0] == '[') {
+		var js json.RawMessage
+		if json.Unmarshal(payload, &js) == nil {
+			return models.PayloadJSON
+		}
 	}
 
 	// try XML
