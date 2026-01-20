@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"mqtt-collector/internal/models"
+	"mqtt-catalog/pkg/models"
 	"net/http"
 	"net/http/httptest"
 	"testing"
