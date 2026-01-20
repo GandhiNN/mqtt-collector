@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
-	"mqtt-collector/pkg/models"
+	"mqtt-catalog/pkg/models"
 	"unicode/utf8"
 )
 

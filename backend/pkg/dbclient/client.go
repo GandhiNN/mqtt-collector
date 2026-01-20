@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"mqtt-collector/internal/models"
+	"mqtt-catalog/pkg/models"
 	"net/http"
 	"time"
 )
@@ -31,7 +31,12 @@ func (c *Client) SendSample(ctx context.Context, sample models.Sample) error {
 		return fmt.Errorf("marshal error: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", c.baseURL+"/api/samples", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequestWithContext(
+		ctx,
+		"POST",
+		c.baseURL+"/api/samples",
+		bytes.NewBuffer(jsonData),
+	)
 	if err != nil {
 		return fmt.Errorf("create request error: %w", err)
 	}
