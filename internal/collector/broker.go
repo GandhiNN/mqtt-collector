@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"mqtt-collector/internal/models"
-	"mqtt-collector/internal/payload"
-	"mqtt-collector/pkg/dbclient"
+	"mqtt-catalog/internal/payload"
+	"mqtt-catalog/pkg/dbclient"
+	"mqtt-catalog/pkg/models"
 	"sync"
 	"time"
 
@@ -24,7 +24,12 @@ type BrokerCollector struct {
 	wg            *sync.WaitGroup
 }
 
-func NewBrokerCollector(brokerID, brokerURL string, dbClient *dbclient.Client, ctx context.Context, wg *sync.WaitGroup) *BrokerCollector {
+func NewBrokerCollector(
+	brokerID, brokerURL string,
+	dbClient *dbclient.Client,
+	ctx context.Context,
+	wg *sync.WaitGroup,
+) *BrokerCollector {
 	clientID := fmt.Sprintf("mqtt-collector-%s-%d", brokerID, time.Now().Unix())
 
 	opts := mqtt.NewClientOptions().

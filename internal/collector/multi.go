@@ -3,8 +3,8 @@ package collector
 import (
 	"context"
 	"log"
-	"mqtt-collector/internal/config"
-	"mqtt-collector/pkg/dbclient"
+	"mqtt-catalog/internal/config"
+	"mqtt-catalog/pkg/dbclient"
 	"os"
 	"os/signal"
 	"sync"

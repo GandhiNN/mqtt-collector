@@ -2,8 +2,8 @@ package main
 
 import (
 	"log"
-	"mqtt-collector/internal/collector"
-	"mqtt-collector/internal/config"
+	"mqtt-catalog/internal/collector"
+	"mqtt-catalog/internal/config"
 )
 
 func main() {
