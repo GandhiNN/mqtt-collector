@@ -115,3 +115,104 @@ func (r *TopicRepository) GetAll(limit, offset int) ([]models.Topic, int, error)
 	}
 	return topics, total, nil
 }
+
+func (r *TopicRepository) GetByBrokerAndTopic(brokerID, topic string) (*models.Topic, error) {
+	query := `
+		SELECT id, broker_id, topic, payload_type, sample_payload, last_seen, created_at
+		FROM topics
+		WHERE broker_id = ? AND topic = ?
+	`
+
+	var version string
+	checkErr := r.db.QueryRow("SELECT sqlite_version()").Scan(&version)
+	if checkErr != nil {
+		query = `
+			SELECT id, broker_id, topic, payload_type, sample_payload, last_seen, created_at
+			FROM topics
+			WHERE broker_id = $1 AND topic = $2
+		`
+	}
+
+	var t models.Topic
+	err := r.db.QueryRow(query, brokerID, topic).Scan(
+		&t.ID,
+		&t.BrokerID,
+		&t.Topic,
+		&t.PayloadType,
+		&t.SamplePayload,
+		&t.LastSeen,
+		&t.CreatedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("query topic: %w", err)
+	}
+
+	return &t, nil
+}
+
+func (r *TopicRepository) GetByBroker(
+	brokerID string,
+	limit, offset int,
+) ([]models.Topic, int, error) {
+	countQuery := "SELECT COUNT(*) FROM topics WHERE broker_id = ?"
+
+	var version string
+	checkErr := r.db.QueryRow("SELECT sqlite_version()").Scan(&version)
+	if checkErr != nil {
+		countQuery = "SELECT COUNT(*) FROM topics WHERE broker_id = $1"
+	}
+
+	var total int
+	err := r.db.QueryRow(countQuery, brokerID).Scan(&total)
+	if err != nil {
+		return nil, 0, fmt.Errorf("count topics: %w", err)
+	}
+
+	query := `
+		SELECT id, broker_id, topic, payload_type, sample_payload, last_seen, created_at
+		FROM topics
+		WHERE broker_id = ?
+		ORDER BY last_seen DESC
+		LIMIT ? OFFSET ?
+	`
+
+	if checkErr != nil {
+		query = `
+			SELECT id, broker_id, topic, payload_type, sample_payload, last_seen, created_at
+			FROM topics
+			WHERE broker_id = $1
+			ORDER BY last_Seen DESC
+			LIMIT $2 OFFSET $3
+		`
+	}
+
+	rows, err := r.db.Query(query, brokerID, limit, offset)
+	if err != nil {
+		return nil, 0, fmt.Errorf("query topics: %w", err)
+	}
+	defer rows.Close()
+
+	var topics []models.Topic
+	for rows.Next() {
+		var t models.Topic
+		err := rows.Scan(
+			&t.ID,
+			&t.BrokerID,
+			&t.Topic,
+			&t.PayloadType,
+			&t.SamplePayload,
+			&t.LastSeen,
+			&t.CreatedAt,
+		)
+		if err != nil {
+			return nil, 0, fmt.Errorf("scan topic: %w", err)
+		}
+		topics = append(topics, t)
+	}
+	return topics, total, nil
+}
