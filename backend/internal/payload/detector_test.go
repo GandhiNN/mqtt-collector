@@ -1,12 +1,4 @@
-// Tests the payload type detection logic:
-// - Empty payloads
-// - Various JSON formats (object, array, string, number)
-// - XML documents
-// - Plain text
-// - Binary data
-// - Invalid UTF-8
-// - Benchmark test for performance testing
-
+// Tests the payload type detection functionality for MQTT messages
 package payload
 
 import (
@@ -14,6 +6,8 @@ import (
 	"testing"
 )
 
+// Validates payload type detection for various data formats including empty payloads,
+// JSON objects/arrays, XML documents, plain test, binary data, and invalid UTF-8 sequences
 func TestDetectType(t *testing.T) {
 	tests := []struct {
 		name     string
