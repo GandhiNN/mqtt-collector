@@ -10,7 +10,7 @@
 package payload
 
 import (
-	"mqtt-collector/pkg/models"
+	"mqtt-catalog/pkg/models"
 	"testing"
 )
 
