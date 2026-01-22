@@ -1,3 +1,4 @@
+// Handles CRUD operations for MQTT topics with upsert capabilities
 package repository
 
 import (
@@ -15,6 +16,7 @@ func NewTopicRepository(db *sql.DB) *TopicRepository {
 	return &TopicRepository{db: db}
 }
 
+// Inserts new topic or updates existing one with latest payload sample and timestamp
 func (r *TopicRepository) Upsert(sample models.Sample) error {
 	query := `
 		INSERT INTO topics (broker_id, topic, payload_type, sample_payload, last_seen, created_at)
@@ -61,6 +63,7 @@ func (r *TopicRepository) Upsert(sample models.Sample) error {
 	return nil
 }
 
+// Retrieves paginated list of all topics with total count
 func (r *TopicRepository) GetAll(limit, offset int) ([]models.Topic, int, error) {
 	// Get total count
 	var total int
@@ -116,6 +119,7 @@ func (r *TopicRepository) GetAll(limit, offset int) ([]models.Topic, int, error)
 	return topics, total, nil
 }
 
+// Finds specific topic by broker ID and topic name combination
 func (r *TopicRepository) GetByBrokerAndTopic(brokerID, topic string) (*models.Topic, error) {
 	query := `
 		SELECT id, broker_id, topic, payload_type, sample_payload, last_seen, created_at
@@ -155,6 +159,7 @@ func (r *TopicRepository) GetByBrokerAndTopic(brokerID, topic string) (*models.T
 	return &t, nil
 }
 
+// Fetches topics filtered by specific broker ID with pagination
 func (r *TopicRepository) GetByBroker(
 	brokerID string,
 	limit, offset int,

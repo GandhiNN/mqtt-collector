@@ -1,3 +1,4 @@
+// Defines core data structures for MQTT catalog system
 package models
 
 import "time"

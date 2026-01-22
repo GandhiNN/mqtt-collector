@@ -1,3 +1,4 @@
+// HTTP client for communicating with the database service API
 package dbclient
 
 import (
@@ -16,6 +17,7 @@ type Client struct {
 	httpClient *http.Client
 }
 
+// Creates new database client with base URL and 10-second timeout
 func New(baseURL string) *Client {
 	return &Client{
 		baseURL: baseURL,
@@ -25,6 +27,7 @@ func New(baseURL string) *Client {
 	}
 }
 
+// Posts MQTT sample data to database service via HTTP API with context support
 func (c *Client) SendSample(ctx context.Context, sample models.Sample) error {
 	jsonData, err := json.Marshal(sample)
 	if err != nil {

@@ -1,3 +1,4 @@
+// Tests the collector configuration loading
 package config
 
 import (

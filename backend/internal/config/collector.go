@@ -1,3 +1,5 @@
+// Loads collector configuration including broker connections,
+// database URLs, and collection intervals
 package config
 
 import (
@@ -18,6 +20,7 @@ type CollectorConfig struct {
 	CollectionDuration time.Duration
 }
 
+// Reads broker config from JSON file and environment variables with fallback defaults
 func LoadCollectorConfig() (*CollectorConfig, error) {
 	configPath := getEnv("BROKERS_CONFIG", "brokers.json")
 	dbServiceURL := getEnv("DB_SERVICE_URL", "http://localhost:8080")
@@ -40,6 +43,7 @@ func LoadCollectorConfig() (*CollectorConfig, error) {
 	}, nil
 }
 
+// Parses JSON configuration file containing MQTT broker connection details
 func loadBrokersConfig(configPath string) ([]BrokerConfig, error) {
 	file, err := os.ReadFile(configPath)
 	if err != nil {
