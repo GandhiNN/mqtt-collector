@@ -140,3 +140,42 @@ func TestHandler_GetTopics(t *testing.T) {
 		t.Errorf("expected 1 topic, got %d", len(response.Topics))
 	}
 }
+
+func TestHandler_GetTopics_WithBrokerFilter(t *testing.T) {
+	db := setupTestDB(t)
+	defer db.Close()
+
+	repo := repository.NewTopicRepository(db)
+	handler := NewHandler(repo)
+
+	repo.Upsert(models.Sample{
+		BrokerID:    "broker1",
+		Topic:       "topic1",
+		PayloadType: models.PayloadJSON,
+		Payload:     []byte(`{}`),
+		Timestamp:   time.Now(),
+	})
+	repo.Upsert(models.Sample{
+		BrokerID:    "broker2",
+		Topic:       "topic2",
+		PayloadType: models.PayloadJSON,
+		Payload:     []byte(`{}`),
+		Timestamp:   time.Now(),
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/api/topics?broker_id=broker1", nil)
+	w := httptest.NewRecorder()
+
+	handler.GetTopics(w, req)
+
+	var response models.TopicListResponse
+	json.NewDecoder(w.Body).Decode(&response)
+
+	if response.Total != 1 {
+		t.Errorf("expected total 1, got %d", response.Total)
+	}
+
+	if response.Topics[0].BrokerID != "broker1" {
+		t.Errorf("expected broker_id 'broker1' got '%s'", response.Topics[0].BrokerID)
+	}
+}
