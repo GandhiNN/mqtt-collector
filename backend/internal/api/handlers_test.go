@@ -179,3 +179,87 @@ func TestHandler_GetTopics_WithBrokerFilter(t *testing.T) {
 		t.Errorf("expected broker_id 'broker1' got '%s'", response.Topics[0].BrokerID)
 	}
 }
+
+func TestHandler_GetTopic(t *testing.T) {
+	db := setupTestDB(t)
+	defer db.Close()
+
+	repo := repository.NewTopicRepository(db)
+	handler := NewHandler(repo)
+
+	sample := models.Sample{
+		BrokerID:    "test-broker",
+		Topic:       "test/topic",
+		PayloadType: models.PayloadJSON,
+		Payload:     []byte(`{"temp": 22.5}`),
+		Timestamp:   time.Now(),
+	}
+	repo.Upsert(sample)
+
+	req := httptest.NewRequest(
+		http.MethodGet,
+		"/api/topics/search?broker_id=test-broker&topic=test/topic",
+		nil,
+	)
+	w := httptest.NewRecorder()
+
+	handler.GetTopic(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, w.Code)
+	}
+
+	var topic models.Topic
+	if err := json.NewDecoder(w.Body).Decode(&topic); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if topic.BrokerID != "test-broker" {
+		t.Errorf("expected broker_id 'test-broker', got '%s'", topic.BrokerID)
+	}
+}
+
+func TestHandler_GetTopic_NotFound(t *testing.T) {
+	db := setupTestDB(t)
+	defer db.Close()
+
+	repo := repository.NewTopicRepository(db)
+	handler := NewHandler(repo)
+
+	req := httptest.NewRequest(
+		http.MethodGet,
+		"/api/topics/search?broker_id=test-broker&topic=nonexistent",
+		nil,
+	)
+	w := httptest.NewRecorder()
+
+	handler.GetTopic(w, req)
+
+	if w.Code != http.StatusNotFound {
+		t.Errorf("expected status %d, got %d", http.StatusNotFound, w.Code)
+	}
+}
+
+func TestHandler_HealthCheck(t *testing.T) {
+	db := setupTestDB(t)
+	defer db.Close()
+
+	repo := repository.NewTopicRepository(db)
+	handler := NewHandler(repo)
+
+	req := httptest.NewRequest(http.MethodGet, "/health", nil)
+	w := httptest.NewRecorder()
+
+	handler.HealthCheck(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, w.Code)
+	}
+
+	var response map[string]string
+	json.NewDecoder(w.Body).Decode(&response)
+
+	if response["status"] != "healthy" {
+		t.Errorf("expected status 'healthy', got '%s'", response["status"])
+	}
+}
