@@ -32,7 +32,7 @@ Stateless MQTT topic discovery service that connects to multiple brokers simulta
 3. Spawns individual BrokerCollector goroutines for each configured broker
 4. Each collector subscribes to all topics (#) and samples unique topics once
 5. Detected payloads are classified (JSON/XML/Text/Binary) using internal/payload
-6. Samples are sent to the API server via HTTP client
+6. Samples are sent to the API server via HTTP client to the API which writes to the database (collector and API server are separate processes communicating via HTTP)
 7. Runs for configured duration with graceful shutdown on signals
 
 ### API Server
