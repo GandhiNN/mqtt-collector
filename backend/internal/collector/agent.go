@@ -2,6 +2,7 @@ package collector
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"mqtt-catalog/internal/payload"
@@ -25,36 +26,39 @@ type BrokerCollector struct {
 }
 
 func NewBrokerCollector(
-	brokerID, brokerURL string,
+	brokerID, brokerURL, clientID, username, password string,
 	dbClient *dbclient.Client,
 	ctx context.Context,
 	wg *sync.WaitGroup,
 ) *BrokerCollector {
-	clientID := fmt.Sprintf("mqtt-collector-%s-%d", brokerID, time.Now().Unix())
-
-	opts := mqtt.NewClientOptions().
-		AddBroker(brokerURL).
-		SetClientID(clientID).
-		SetCleanSession(true).
-		SetAutoReconnect(false).
-		SetConnectTimeout(10 * time.Second).
-		SetConnectionLostHandler(func(client mqtt.Client, err error) {
-			log.Printf("[%s] Connection lost: %v", brokerID, err)
-		})
-
-	client := mqtt.NewClient(opts)
 
 	bc := &BrokerCollector{
 		brokerID:      brokerID,
 		brokerURL:     brokerURL,
-		mqttClient:    client,
 		dbClient:      dbClient,
 		sampledTopics: make(map[string]bool),
 		ctx:           ctx,
 		wg:            wg,
 	}
 
-	opts.SetDefaultPublishHandler(bc.messageHandler)
+	// For now, we trust self-signed certificate
+	tlsConfig := &tls.Config{InsecureSkipVerify: true}
+
+	opts := mqtt.NewClientOptions().
+		AddBroker(brokerURL).
+		SetClientID(clientID).
+		SetUsername(username).
+		SetPassword(password).
+		SetCleanSession(true).
+		SetTLSConfig(tlsConfig).
+		SetAutoReconnect(true).
+		SetConnectTimeout(10 * time.Second).
+		SetConnectionLostHandler(func(client mqtt.Client, err error) {
+			log.Printf("[%s] Connection lost: %v", brokerID, err)
+		}).
+		SetDefaultPublishHandler(bc.messageHandler)
+
+	bc.mqttClient = mqtt.NewClient(opts)
 
 	return bc
 }
