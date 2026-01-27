@@ -10,8 +10,11 @@ import (
 )
 
 type BrokerConfig struct {
-	ID  string `json:"id"`
-	URL string `json:"url"`
+	ID       string `json:"id"`
+	URL      string `json:"url"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
+	ClientID string `json:"client_id,omitempty"`
 }
 
 type CollectorConfig struct {

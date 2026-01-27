@@ -37,7 +37,16 @@ func (mc *MultiCollector) Run(duration time.Duration) error {
 
 	for _, broker := range mc.brokers {
 		wg.Add(1)
-		bc := NewBrokerCollector(broker.ID, broker.URL, mc.dbClient, mc.ctx, &wg)
+		bc := NewBrokerCollector(
+			broker.ID,
+			broker.URL,
+			broker.ClientID,
+			broker.Username,
+			broker.Password,
+			mc.dbClient,
+			mc.ctx,
+			&wg,
+		)
 		go func(collector *BrokerCollector) {
 			if err := collector.Run(duration); err != nil {
 				log.Printf("Error in collector: %v", err)
