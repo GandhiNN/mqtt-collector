@@ -16,8 +16,8 @@ func TestLoadBrokersConfig(t *testing.T) {
 	defer os.Remove(tmpfile.Name())
 
 	content := `[
-		{"id": "test-broker-1", "url": "tcp://localhost:1883"},
-		{"id": "test-broker-2", "url": "tcp://localhost:1884"}
+		{"id": "test-broker-1", "url": "tcp://localhost:1883", "username": "test-username-1", "password": "test-password-1", "client_id": "test-client_id-1"},
+		{"id": "test-broker-2", "url": "tcp://localhost:1884", "username": "test-username-2", "password": "test-password-2", "client_id": "test-client_id-2"}
 	]`
 
 	if _, err := tmpfile.Write([]byte(content)); err != nil {
